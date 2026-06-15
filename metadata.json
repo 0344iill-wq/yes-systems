@@ -1,0 +1,6 @@
+{
+  "name": "y.e.s. Systems",
+  "description": "A single-page, high-end cinematic hero section with glassmorphic navigation, custom typography, and fluid visual elements.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
