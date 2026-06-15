@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowUp, ChevronDown } from "lucide-react";
+import { ArrowUp, ChevronDown, Menu, X } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
@@ -137,6 +137,7 @@ export default function App() {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [lang, setLang] = useState<'en' | 'he'>('en');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
 
   const SECTIONS = lang === 'en' ? SECTIONS_EN : SECTIONS_HE;
   const t = TRANSLATIONS[lang];
@@ -414,10 +415,10 @@ export default function App() {
       />
 
       {/* Glassmorphic Navigation Bar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 flex flex-row justify-between items-center px-8 py-6 max-w-7xl mx-auto w-full backdrop-blur-sm bg-black/10 border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 flex flex-row justify-between items-center px-4 sm:px-8 py-4 sm:py-6 max-w-7xl mx-auto w-full backdrop-blur-sm bg-black/10 border-b border-white/5">
         <div
           onClick={() => handleScrollTo(0)}
-          className="text-3xl tracking-tight text-white select-none cursor-pointer font-normal transition-all duration-300 hover:opacity-90 font-serif"
+          className="text-2xl sm:text-3xl tracking-tight text-white select-none cursor-pointer font-normal transition-all duration-300 hover:opacity-90 font-serif"
           style={{ fontFamily: "'Instrument Serif', serif" }}
         >
           y.e.s. Systems<sup className="text-xs ml-0.5 tracking-normal align-super">®</sup>
@@ -462,21 +463,95 @@ export default function App() {
           </button>
         </div>
 
-        <div className="flex flex-row items-center gap-4">
+        <div className="flex flex-row items-center gap-3 sm:gap-4">
           <button
             onClick={() => setLang(lang === 'en' ? 'he' : 'en')}
-            className="text-xs tracking-wider uppercase font-semibold text-white/60 hover:text-white transition-colors cursor-pointer px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 bg-black/10 backdrop-blur-sm font-sans"
+            className="text-xs tracking-wider uppercase font-semibold text-white/60 hover:text-white transition-colors cursor-pointer px-2.5 sm:px-3 py-1.5 border border-white/10 rounded-lg hover:bg-white/5 bg-black/10 backdrop-blur-sm font-sans"
           >
             {lang === 'en' ? 'עב' : 'EN'}
           </button>
           <button
             onClick={() => handleScrollTo(0.88)}
-            className="liquid-glass rounded-full px-6 py-2.5 text-sm text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 font-medium tracking-wide shadow-lg cursor-pointer"
+            className="hidden md:inline-block liquid-glass rounded-full px-6 py-2.5 text-sm text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 font-medium tracking-wide shadow-lg cursor-pointer"
+          >
+            {t.navCTA}
+          </button>
+          {/* Mobile menu trigger */}
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="md:hidden flex items-center justify-center p-2 border border-white/10 rounded-lg bg-black/10 backdrop-blur-sm text-white hover:bg-white/5 transition-colors cursor-pointer"
+            title="Menu"
+          >
+            <Menu className="w-5 h-5" />
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Glassmorphic Overlay Menu */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-lg flex flex-col justify-center items-center gap-8 animate-fade-rise font-sans">
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            className="absolute top-6 right-6 p-2 text-white/60 hover:text-white hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/10 rounded-full bg-white/5"
+            title="Close"
+          >
+            <X className="w-6 h-6" />
+          </button>
+
+          <button
+            onClick={() => {
+              handleScrollTo(0);
+              setMobileMenuOpen(false);
+            }}
+            className="text-2xl font-normal text-white hover:opacity-80 transition-all font-serif"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            {t.navHome}
+          </button>
+          <button
+            onClick={() => {
+              handleScrollTo(0.35);
+              setMobileMenuOpen(false);
+            }}
+            className="text-2xl font-normal text-white hover:opacity-80 transition-all font-serif"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            {t.navPhilosophy}
+          </button>
+          <button
+            onClick={() => {
+              handleScrollTo(0.6);
+              setMobileMenuOpen(false);
+            }}
+            className="text-2xl font-normal text-white hover:opacity-80 transition-all font-serif"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            {t.navPrecision}
+          </button>
+          <button
+            onClick={() => {
+              handleScrollTo(0.88);
+              setMobileMenuOpen(false);
+            }}
+            className="text-2xl font-normal text-white hover:opacity-80 transition-all font-serif"
+            style={{ fontFamily: "'Instrument Serif', serif" }}
+          >
+            {t.navBegin}
+          </button>
+
+          <div className="w-16 h-px bg-white/15 my-4" />
+
+          <button
+            onClick={() => {
+              handleScrollTo(1.0);
+              setMobileMenuOpen(false);
+            }}
+            className="liquid-glass rounded-full px-8 py-3 text-sm text-white hover:scale-[1.03] active:scale-[0.98] transition-all duration-300 font-medium tracking-wide shadow-lg cursor-pointer"
           >
             {t.navCTA}
           </button>
         </div>
-      </nav>
+      )}
 
       {/* Narrative Section Overlays */}
       <div className="fixed inset-0 pointer-events-none z-20">
@@ -500,7 +575,7 @@ export default function App() {
               }}
             >
               <div className={`max-w-2xl rounded-3xl transition-all duration-300 max-h-[85vh] flex flex-col backdrop-blur-md bg-black/40 border border-white/10 shadow-[0_24px_50px_rgba(0,0,0,0.7)] ${
-                idx === SECTIONS.length - 1 ? "p-6 sm:p-10" : "p-8 sm:p-12"
+                idx === SECTIONS.length - 1 ? "p-5 sm:p-8 md:p-10" : "p-6 sm:p-10 md:p-12"
               }`}>
                 {/* Scrollable inner content prevents scrolling the glowing card border */}
                 <div className="w-full overflow-y-auto no-scrollbar pr-1 flex flex-col items-center max-h-full">
@@ -509,7 +584,7 @@ export default function App() {
                   </span>
                   <h2
                     className={`${
-                      idx === SECTIONS.length - 1 ? "text-3xl sm:text-5xl" : "text-4xl sm:text-6xl md:text-7xl"
+                      idx === SECTIONS.length - 1 ? "text-2xl sm:text-4xl" : "text-3xl sm:text-5xl md:text-6xl"
                     } font-normal leading-tight text-white mb-4 font-serif animate-fade-rise`}
                     style={{ fontFamily: "'Instrument Serif', serif" }}
                   >
@@ -553,7 +628,7 @@ export default function App() {
                     }`}>
                       {!formSubmitted ? (
                         <form onSubmit={handleFormSubmit} className="space-y-3">
-                          <div className="grid grid-cols-2 gap-3 font-sans">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
                             <div>
                               <label className="text-[10px] tracking-widest text-white/50 uppercase block mb-1 font-medium">{t.formName}</label>
                               <input
@@ -626,7 +701,7 @@ export default function App() {
       </div>
 
       {/* Floating Dot Navigation Indicators */}
-      <div className={`fixed top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40 ${
+      <div className={`fixed top-1/2 -translate-y-1/2 hidden md:flex flex-col gap-4 z-40 ${
         lang === 'he' ? 'left-8' : 'right-8'
       }`}>
         {SECTIONS.map((section, idx) => {
