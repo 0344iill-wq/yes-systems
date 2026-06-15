@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020e17" />
+      <stop offset="50%" stop-color="#001827" />
+      <stop offset="100%" stop-color="#002237" />
+    </linearGradient>
+    
+    <!-- Border Gradient (Liquid Glass effect) -->
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255, 255, 255, 0.45)" />
+      <stop offset="30%" stop-color="rgba(255, 255, 255, 0.15)" />
+      <stop offset="70%" stop-color="rgba(255, 255, 255, 0.05)" />
+      <stop offset="100%" stop-color="rgba(255, 255, 255, 0.35)" />
+    </linearGradient>
+
+    <!-- Glow filter for premium high-tech feel -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Outer Circle with Liquid Glass Border -->
+  <circle cx="256" cy="256" r="236" fill="url(#bgGrad)" stroke="url(#borderGrad)" stroke-width="14" />
+  
+  <!-- Stylized "y." Monogram -->
+  <g filter="url(#glow)">
+    <text x="242" y="345" font-family="'Instrument Serif', Georgia, 'Times New Roman', serif" font-size="290" fill="#ffffff" text-anchor="middle" font-style="italic">y</text>
+    <!-- A glowing dot next to the "y" representing the "dot" in "y.e.s. Systems" -->
+    <circle cx="332" cy="318" r="18" fill="#ffffff" />
+  </g>
+</svg>
