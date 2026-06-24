@@ -6,7 +6,7 @@ import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 // Register GSAP plugins
 gsap.registerPlugin(ScrollToPlugin);
 
-const TOTAL_FRAMES = 180;
+const TOTAL_FRAMES = 194;
 
 interface Section {
   title: string;
@@ -400,7 +400,7 @@ export default function App() {
         className="fixed inset-0 w-full h-full pointer-events-none z-0"
         style={{
           transform: "scale(1.05)",
-          filter: "url(#sharpen-filter) contrast(1.03) brightness(1.02)",
+          filter: "url(#sharpen-filter) contrast(1.08) brightness(1.05) saturate(1.3)",
           backfaceVisibility: "hidden",
         }}
       />
