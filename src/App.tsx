@@ -127,7 +127,8 @@ const TRANSLATIONS = {
 export default function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const currentFrameRef = useRef<number>(0);
-  const frameObjRef = useRef({ val: 0 });
+  const targetFractionRef = useRef<number>(0);
+  const interpolatedFractionRef = useRef<number>(0);
 
   const [images, setImages] = useState<HTMLImageElement[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -216,13 +217,14 @@ export default function App() {
     ctx.drawImage(img, zoomedOffsetX, zoomedOffsetY, zoomedWidth, zoomedHeight);
   };
 
-  // 3. Canvas Resizing
+  // 3. Canvas Resizing (DPI-Aware)
   useEffect(() => {
     const handleResize = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
       drawFrame(currentFrameRef.current);
     };
 
@@ -232,53 +234,60 @@ export default function App() {
     return () => window.removeEventListener("resize", handleResize);
   }, [images]);
 
-  // 4. Scroll mapping with GSAP frame transition interpolation
+  // 4. Scroll mapping with unified momentum lerping and synchronous updates
   useEffect(() => {
     if (loading || images.length === 0) return;
 
-    let ticking = false;
-
     const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrollTop = window.scrollY;
-          const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-
-          if (maxScroll > 0) {
-            const fraction = Math.max(0, Math.min(1, scrollTop / maxScroll));
-            setScrollFraction(fraction);
-
-            const targetFrameIndex = Math.min(
-              TOTAL_FRAMES - 1,
-              Math.floor(fraction * TOTAL_FRAMES)
-            );
-
-            // Smoothly interpolate the frame updates using GSAP
-            gsap.to(frameObjRef.current, {
-              val: targetFrameIndex,
-              duration: 0.35, // smooth interpolation timing
-              ease: "power2.out",
-              overwrite: "auto",
-              onUpdate: () => {
-                const index = Math.round(frameObjRef.current.val);
-                if (currentFrameRef.current !== index) {
-                  currentFrameRef.current = index;
-                  drawFrame(index);
-                }
-              }
-            });
-          }
-          ticking = false;
-        });
-        ticking = true;
+      const scrollTop = window.scrollY;
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (maxScroll > 0) {
+        targetFractionRef.current = Math.max(0, Math.min(1, scrollTop / maxScroll));
       }
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
-    // Initial draw once loading is done
+    
+    let animationFrameId: number;
+    const tick = () => {
+      const diff = targetFractionRef.current - interpolatedFractionRef.current;
+      
+      if (Math.abs(diff) > 0.0001) {
+        // Smooth lerp (0.08 creates a beautiful organic momentum/smoothing effect)
+        interpolatedFractionRef.current += diff * 0.08;
+        
+        // Clamp to target when extremely close to prevent micro-adjustments
+        if (Math.abs(targetFractionRef.current - interpolatedFractionRef.current) < 0.0001) {
+          interpolatedFractionRef.current = targetFractionRef.current;
+        }
+
+        // Keep bounds strictly valid
+        interpolatedFractionRef.current = Math.max(0, Math.min(1, interpolatedFractionRef.current));
+        
+        // Drive overlay transitions and text movement synchronously
+        setScrollFraction(interpolatedFractionRef.current);
+
+        // Update canvas frame matching the smoothed position
+        const targetFrameIndex = Math.min(
+          TOTAL_FRAMES - 1,
+          Math.floor(interpolatedFractionRef.current * TOTAL_FRAMES)
+        );
+
+        if (currentFrameRef.current !== targetFrameIndex) {
+          currentFrameRef.current = targetFrameIndex;
+          drawFrame(targetFrameIndex);
+        }
+      }
+      animationFrameId = requestAnimationFrame(tick);
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
     drawFrame(0);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, [loading, images]);
 
   // 5. Interactive Mouse Parallax
@@ -400,7 +409,7 @@ export default function App() {
         className="fixed inset-0 w-full h-full pointer-events-none z-0"
         style={{
           transform: "scale(1.05)",
-          filter: "url(#sharpen-filter) contrast(1.08) brightness(1.05) saturate(1.3)",
+          filter: "contrast(1.04) brightness(1.02) saturate(1.15)",
           backfaceVisibility: "hidden",
         }}
       />
